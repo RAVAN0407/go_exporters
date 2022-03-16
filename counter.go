@@ -13,12 +13,17 @@ import (
 
 func random_counter() {
 
-	a := float64(rand.Intn(200))
-	fmt.Println(a)
-	counter1.Add(a)
-	counter2.Add(a)
-	time.Sleep(2 * time.Second)
-	counter1.Inc()
+	go func()
+	{
+		for {
+			a := float64(rand.Intn(200))
+			fmt.Println(a)
+			counter1.Add(a)
+			counter2.Add(a)
+			time.Sleep(2 * time.Second)
+			counter1.Inc()
+		}
+	}()
 
 }
 
