@@ -11,38 +11,65 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func random_counter() {
+func counter01() {
 
-	go func()
-	{
-		for {
-			a := float64(rand.Intn(200))
-			fmt.Println(a)
-			counter1.Add(a)
-			counter2.Add(a)
-			time.Sleep(2 * time.Second)
-			counter1.Inc()
-		}
-	}()
+	a := float64(rand.Intn(200))
+	random_Counter1_float64.Add(a)
+	for {
+		time.Sleep(2 * time.Second)
+		random_Counter1_float64.Inc()
+	}
+
+}
+
+func counter02() {
+	b := float64(rand.Intn(200))
+	random_Counter2_float64.Add(b)
+	time.Sleep(2 * time.Second)
+	random_Counter2_float64.Inc()
+}
+
+func gauge01() {
+	c := float64(rand.Intn(200))
+	random_gauge_float64.Set(c)
+	time.Sleep(2 * time.Second)
+	random_gauge_float64.Inc()
+	random_gauge_float64.Dec()
 
 }
 
 var (
-	counter1 = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "counter1",
+	random_Counter1_float64 = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "random_Counter1_float64",
 		Help: "random number 1",
 	})
-
-	counter2 = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "counter2",
-		Help: "random number2",
+	random_Counter2_float64 = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "random_Counter2_float64",
+		Help: "random number 2",
+	})
+	random_gauge_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "random_gauge_float64",
+		Help:      "random gauge ",
 	})
 )
 
+func init() {
+	prometheus.MustRegister(random_gauge_float64)
+}
+
 func main() {
-	random_counter()
-	fmt.Println("server started at port 2112")
+
+	go counter01()
+	go counter02()
+	go gauge01()
+	fmt.Println("server started at port 9000")
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":2112", nil)
+	err := http.ListenAndServe(":9000", nil)
+	if err != nil {
+		panic(err)
+	}
 
 }
+
