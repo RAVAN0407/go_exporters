@@ -65,6 +65,7 @@ func main() {
 	go counter02()
 	go gauge01()
 	f := get_mem_info()
+	fmt.Print(f)
 	fmt.Println("server started at port 9000")
 	http.Handle("/metrics", promhttp.Handler())
 	err := http.ListenAndServe(":9000", nil)
