@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
-
+	"parser"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -64,6 +64,7 @@ func main() {
 	go counter01()
 	go counter02()
 	go gauge01()
+	f := get_mem_info()
 	fmt.Println("server started at port 9000")
 	http.Handle("/metrics", promhttp.Handler())
 	err := http.ListenAndServe(":9000", nil)
