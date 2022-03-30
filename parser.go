@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-func Get_mem_info() map[string]float64 { 	//return map
+func Get_mem_info() map[string]float64 { 	
 	prg := "cat"
 	arg1 := "/proc/meminfo"
 	var arr [5][]string
@@ -19,7 +19,7 @@ func Get_mem_info() map[string]float64 { 	//return map
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	split := strings.Split(string(res), "\n")
+	split := strings.Split(string(res), "\n") //spliting strings
 	space := regexp.MustCompile(`\s+`)
 	for i := 0; i < 5; i++ {
 		s[i] = space.ReplaceAllString(split[i], " ")
