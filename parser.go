@@ -19,7 +19,7 @@ func Get_mem_info() map[string]float64 {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	split := strings.Split(string(res), "\n")
+	split := strings.Split(string(res), "\n") //spliting strings
 	space := regexp.MustCompile(`\s+`)
 	for i := 0; i < 5; i++ {
 		s[i] = space.ReplaceAllString(split[i], " ")
