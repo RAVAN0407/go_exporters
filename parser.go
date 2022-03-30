@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-func Get_mem_info() map[string]float64 { 	//return map
+func Get_mem_info() map[string]float64 { 	
 	prg := "cat"
 	arg1 := "/proc/meminfo"
 	var arr [5][]string
