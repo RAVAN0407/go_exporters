@@ -93,8 +93,8 @@ var (
 	})
 )
 
-func meminfo(){
-	go func() {
+func collect_meminfo(){
+
 			for {
 					mi := parser.Get_mem_info()
 					memfree_bytes.Set(mi["MemFree:"])
@@ -105,13 +105,13 @@ func meminfo(){
 					time.Sleep(2 * time.Second)
 
 			}
-	}()
+
 
 
 }
 
-func uptime(){
-	go func() {
+func collect_uptime(){
+	
 		for {
 			ut :=parser.Get_uptime()
 			wall_clock_since_boot_bytes.Set(ut["walk_clock"])
@@ -119,11 +119,10 @@ func uptime(){
 			time.Sleep(2 * time.Second)
 		}
 
-	}()
+
 }
 
-func loadavg(){
-	go func() {
+func collect_loadavg(){
 		for {
 				la :=parser.Get_loadavg()
 				process_gauge01_float64.Set(la["process1"])
@@ -134,7 +133,7 @@ func loadavg(){
 				process_gauge06_float64.Set(la["process6"])
 				time.Sleep(2 * time.Second)
 		}
-	}()
+	
 }
 
 func init() { 
@@ -154,9 +153,9 @@ func init() {
 }
 
 func main() {
-	 loadavg()
-	 meminfo()
-	 uptime()
+	go collect_loadavg()
+	go collect_meminfo()
+	go collect_uptime()
 	fmt.Println("server started at port 9000")
 	http.Handle("/metrics", promhttp.Handler())
 	err := http.ListenAndServe(":9000", nil)
