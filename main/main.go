@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"main/parser" 
+	"main/parser"
 	"net/http"
 	"time"
 
@@ -91,52 +91,127 @@ var (
 		Name:      "process_gauge06_float64",
 		Help:      "random gauge ",
 	})
+
+	cpu_usr_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_usr_float64",
+		Help:      "random gauge ",
+	})
+	cpu_nice_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_nice_float64",
+		Help:      "random gauge ",
+	})
+	cpu_sys_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_sys_float64",
+		Help:      "random gauge ",
+	})
+	cpu_iowait_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_iowait_float64",
+		Help:      "random gauge ",
+	})
+	cpu_irq_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_irq_float64",
+		Help:      "random gauge ",
+	})
+	cpu_soft_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_soft_float64",
+		Help:      "random gauge ",
+	})
+	cpu_steal_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_steal_float64",
+		Help:      "random gauge ",
+	})
+	cpu_guest_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_guest_float64",
+		Help:      "random gauge ",
+	})
+	cpu_gnice_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_gnice_float64",
+		Help:      "random gauge ",
+	})
+	cpu_idle_float64 = prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "our_company",
+		Subsystem: "blob_storage",
+		Name:      "cpu_idle_float64",
+		Help:      "random gauge ",
+	})
 )
 
-func collect_meminfo(){
+func collect_meminfo() {
 
-			for {
-					mi := parser.Get_mem_info()
-					memfree_bytes.Set(mi["MemFree:"])
-					memavailable_bytes.Set(mi["MemAvailable:"])
-					memtotal_bytes_total.Set(mi["MemTotal:"])
-					buffers_byte.Set(mi["Buffers:"])
-					cached_bytes.Set(mi["Cached:"])
-					time.Sleep(2 * time.Second)
+	for {
+		mi := parser.Get_mem_info()
+		memfree_bytes.Set(mi["MemFree:"])
+		memavailable_bytes.Set(mi["MemAvailable:"])
+		memtotal_bytes_total.Set(mi["MemTotal:"])
+		buffers_byte.Set(mi["Buffers:"])
+		cached_bytes.Set(mi["Cached:"])
+		time.Sleep(2 * time.Second)
 
-			}
-
-
+	}
 
 }
 
-func collect_uptime(){
-	
-		for {
-			ut :=parser.Get_uptime()
-			wall_clock_since_boot_bytes.Set(ut["walk_clock"])
-			idle_cputime_bytes_total.Set(ut["combined_idletime"])
-			time.Sleep(2 * time.Second)
-		}
+func collect_uptime() {
 
+	for {
+		ut := parser.Get_uptime()
+		wall_clock_since_boot_bytes.Set(ut["walk_clock"])
+		idle_cputime_bytes_total.Set(ut["combined_idletime"])
+		time.Sleep(2 * time.Second)
+	}
 
 }
 
-func collect_loadavg(){
-		for {
-				la :=parser.Get_loadavg()
-				process_gauge01_float64.Set(la["process1"])
-				process_gauge02_float64.Set(la["process2"])
-				process_gauge03_float64.Set(la["process3"])
-				process_gauge04_float64.Set(la["process4"])
-				process_gauge05_float64.Set(la["process5"])
-				process_gauge06_float64.Set(la["process6"])
-				time.Sleep(2 * time.Second)
-		}
-	
+func collect_cpudetails() {
+	for {
+		res := parser.Get_mpstat()
+		cpu_usr_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Usr)
+		cpu_sys_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Sys)
+		cpu_gnice_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Gnice)
+		cpu_guest_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Guest)
+		cpu_idle_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Idle)
+		cpu_iowait_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Iowait)
+		cpu_irq_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Irq)
+		cpu_nice_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Nice)
+		cpu_soft_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Soft)
+		cpu_steal_float64.Set(res.Sysstat.Hosts[0].Statistics[0].CPULoad[0].Steal)
+
+	}
 }
 
-func init() { 
+func collect_loadavg() {
+	for {
+		la := parser.Get_loadavg()
+		process_gauge01_float64.Set(la["process1"])
+		process_gauge02_float64.Set(la["process2"])
+		process_gauge03_float64.Set(la["process3"])
+		process_gauge04_float64.Set(la["process4"])
+		process_gauge05_float64.Set(la["process5"])
+		process_gauge06_float64.Set(la["process6"])
+		time.Sleep(2 * time.Second)
+	}
+
+}
+
+func init() {
 	prometheus.MustRegister(memavailable_bytes)
 	prometheus.MustRegister(memfree_bytes)
 	prometheus.MustRegister(memtotal_bytes_total)
@@ -150,6 +225,16 @@ func init() {
 	prometheus.MustRegister(process_gauge04_float64)
 	prometheus.MustRegister(process_gauge05_float64)
 	prometheus.MustRegister(process_gauge06_float64)
+	prometheus.MustRegister(cpu_gnice_float64)
+	prometheus.MustRegister(cpu_guest_float64)
+	prometheus.MustRegister(cpu_idle_float64)
+	prometheus.MustRegister(cpu_iowait_float64)
+	prometheus.MustRegister(cpu_irq_float64)
+	prometheus.MustRegister(cpu_nice_float64)
+	prometheus.MustRegister(cpu_soft_float64)
+	prometheus.MustRegister(cpu_steal_float64)
+	prometheus.MustRegister(cpu_sys_float64)
+	prometheus.MustRegister(cpu_usr_float64)
 }
 
 func main() {

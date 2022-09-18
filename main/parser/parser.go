@@ -6,7 +6,62 @@ import (
 	"strings"
 	"strconv"
 	"regexp"
+	"log"
+	"encoding/json"
 )
+type Mpstat_Details struct {
+	Sysstat struct {
+		Hosts []struct {
+			Nodename     string `json:"nodename"`
+			Sysname      string `json:"sysname"`
+			Release      string `json:"release"`
+			Machine      string `json:"machine"`
+			NumberOfCpus int    `json:"number-of-cpus"`
+			Date         string `json:"date"`
+			Statistics   []struct {
+				Timestamp string `json:"timestamp"`
+				CPULoad   []struct {
+					CPU    string  `json:"cpu"`
+					Usr    float64 `json:"usr"`
+					Nice   float64 `json:"nice"`
+					Sys    float64 `json:"sys"`
+					Iowait float64 `json:"iowait"`
+					Irq    float64 `json:"irq"`
+					Soft   float64 `json:"soft"`
+					Steal  float64 `json:"steal"`
+					Guest  float64 `json:"guest"`
+					Gnice  float64 `json:"gnice"`
+					Idle   float64 `json:"idle"`
+				} `json:"cpu-load"`
+			} `json:"statistics"`
+		} `json:"hosts"`
+	} `json:"sysstat"`
+}
+
+type Iostat_Details struct {
+	Sysstat struct {
+		Hosts []struct {
+			Nodename     string `json:"nodename"`
+			Sysname      string `json:"sysname"`
+			Release      string `json:"release"`
+			Machine      string `json:"machine"`
+			NumberOfCpus int    `json:"number-of-cpus"`
+			Date         string `json:"date"`
+			Statistics   []struct {
+				Disk []struct {
+					DiskDevice string  `json:"disk_device"`
+					Tps        float64 `json:"tps"`
+					KBReadS    float64 `json:"kB_read/s"`
+					KBWrtnS    float64 `json:"kB_wrtn/s"`
+					KBDscdS    float64 `json:"kB_dscd/s"`
+					KBRead     int     `json:"kB_read"`
+					KBWrtn     int     `json:"kB_wrtn"`
+					KBDscd     int     `json:"kB_dscd"`
+				} `json:"disk"`
+			} `json:"statistics"`
+		} `json:"hosts"`
+	} `json:"sysstat"`
+}
 
 func Get_mem_info() map[string]float64 { 	
 	prg := "cat"
@@ -93,4 +148,42 @@ func Get_loadavg() map[string]float64{
 		fmt.Println(err.Error())
 	}
 	return lavg
+}
+
+func Get_mpstat() Mpstat_Details{
+	prg := "mpstat"
+	arg1 := "-o"
+	arg2 := "JSON"
+	cmd := exec.Command(prg, arg1,arg2)
+	res, err := cmd.Output()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	var mp_stat Mpstat_Details
+	err = json.Unmarshal(res, &mp_stat)
+    if err != nil {
+        log.Fatal("Error during Unmarshal(): ", err)
+    }
+	return mp_stat
+
+}
+
+func Get_iostat() Iostat_Details{
+	prg := "mpstat"
+	arg0:= "-d"
+	arg1 := "-o"
+	arg2 := "JSON"
+	cmd := exec.Command(prg,arg0,arg1,arg2)
+	res, err := cmd.Output()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	var io_stat Iostat_Details
+	err = json.Unmarshal(res, &io_stat)
+    if err != nil {
+        log.Fatal("Error during Unmarshal(): ", err)
+    }
+	return io_stat
+
+
 }
